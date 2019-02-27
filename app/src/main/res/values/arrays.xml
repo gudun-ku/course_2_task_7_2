@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="tables">
+        <item>album</item>
+        <item>song</item>
+        <item>albumsong</item>
+    </string-array>
+
+    <string-array name="tablelabels">
+        <item>Albums</item>
+        <item>Songs</item>
+        <item>AlbumSongs</item>
+    </string-array>
+
+    <string-array name="actions">
+        <item>query</item>
+        <item>insert</item>
+        <item>update</item>
+        <item>delete</item>
+    </string-array>
+</resources>

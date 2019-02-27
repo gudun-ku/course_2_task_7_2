@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">SecondAppForContentProviderTest</string>
     <string name="table_label">Table</string>
     <string name="action_label">Action</string>
     <string name="id_label">Element Id</string>
