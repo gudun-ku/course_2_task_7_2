@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             StringBuilder builder = new StringBuilder();
             do {
-                builder.append(data.getString(data.getColumnIndex("name"))).append("\n");
+                builder.append(data.getString(data.getColumnIndex("id"))).append("\n");
             } while (data.moveToNext());
             Toast.makeText(this, builder.toString(), Toast.LENGTH_LONG).show();
         }
