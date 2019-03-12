@@ -1,5 +1,6 @@
 package elegion.com.secondappforcontentprovidertest;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
@@ -103,22 +104,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         String url = "content://com.elegion.roomdatabase.musicprovider/" + table.toLowerCase();
         // data id
+        Uri contentUri = Uri.parse(url);
+        Uri uri = contentUri;
         String dataId = args.getString("ID");
-        String selection = null;
-        String[] selectionArgs = null;
+
 
         if (!dataId.isEmpty()) {
-            selection = "id = " + dataId;
-            selectionArgs = new String[]{"id"};
-        };
-
-
+           uri = ContentUris.withAppendedId(contentUri,Long.parseLong(dataId));
+        }
 
         return new CursorLoader(this,
-                Uri.parse(url),
+                uri,
                 null,
-                selection,
-                selectionArgs,
+                null,
+                null,
                 null);
     }
 
@@ -126,9 +125,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
 
+            String[] columnNames = data.getColumnNames();
             StringBuilder builder = new StringBuilder();
             do {
-                builder.append(data.getString(data.getColumnIndex("id"))).append("\n");
+                for (String columnName : columnNames) {
+                    builder.append(data.getString(data.getColumnIndex(columnName))).append(";");
+                }
+                builder.append("\n");
             } while (data.moveToNext());
             Toast.makeText(this, builder.toString(), Toast.LENGTH_LONG).show();
         }
