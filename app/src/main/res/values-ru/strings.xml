@@ -7,4 +7,9 @@
     <string name="data1_label">data 1</string>
     <string name="data2_label">data 2</string>
     <string name="data3_label">data 3</string>
+
+    <string name="str_action_query">query</string>
+    <string name="str_action_insert">insert</string>
+    <string name="str_action_update">update</string>
+    <string name="str_action_delete">delete</string>
 </resources>

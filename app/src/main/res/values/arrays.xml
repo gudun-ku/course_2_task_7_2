@@ -14,9 +14,9 @@
     </string-array>
 
     <string-array name="actions">
-        <item>query</item>
-        <item>insert</item>
-        <item>update</item>
-        <item>delete</item>
+        <item>@string/str_action_query</item>
+        <item>@string/str_action_insert</item>
+        <item>@string/str_action_update</item>
+        <item>@string/str_action_update</item>
     </string-array>
 </resources>

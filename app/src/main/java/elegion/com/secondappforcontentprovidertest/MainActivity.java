@@ -20,6 +20,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
  View.OnClickListener {
     private final int LOADER_ID = 12;
 
+    private final String ACTION_QUERY = getString(R.string.str_action_query);
+    private final String ACTION_INSERT = getString(R.string.str_action_insert);
+    private final String ACTION_UPDATE = getString(R.string.str_action_update);
+    private final String ACTION_DELETE = getString(R.string.str_action_delete);
+
     private Spinner mTableSpinner;
     private Spinner mActionSpinner;
     private EditText mEditId, mEditData1, mEditData2, mEditData3;
@@ -36,24 +41,46 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onClick(View v) {
 
-        //let's prepare our arguments
+
         String[] tables =  getResources().getStringArray(R.array.tables);
+        String action = mActionSpinner.getSelectedItem().toString();
         String table = tables[(int) mTableSpinner.getSelectedItemId()];
-        Bundle args = new Bundle();
-        args.putString("ACTION", mActionSpinner.getSelectedItem().toString());
-        args.putString("TABLE", table);
-        args.putString("ID", mEditId.getText().toString());
-        args.putString("DATA1", mEditData1.getText().toString());
-        args.putString("DATA2", mEditData2.getText().toString());
-        args.putString("DATA3", mEditData3.getText().toString());
 
+        if (action.equals(ACTION_QUERY)) {
 
-        mLoader = getSupportLoaderManager().getLoader(12);
-        if (mLoader == null) {
-            mLoader = getSupportLoaderManager().initLoader(12, args, this);
+            Bundle args = new Bundle();
+            args.putString("ACTION", action);
+            args.putString("TABLE", table);
+            args.putString("ID", mEditId.getText().toString());
+            args.putString("DATA1", mEditData1.getText().toString());
+            args.putString("DATA2", mEditData2.getText().toString());
+            args.putString("DATA3", mEditData3.getText().toString());
+
+            mLoader = getSupportLoaderManager().getLoader(12);
+            if (mLoader == null) {
+                mLoader = getSupportLoaderManager().initLoader(12, args, this);
+            } else {
+                mLoader = getSupportLoaderManager().restartLoader(12, args, this);
+            }
+
+        } else if (action.equals(ACTION_INSERT)) {
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("id", 0);
+            contentValues.put("name", "new Name");
+            contentValues.put("release", "tomorrow");
+            getContentResolver().update(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table + "/" + ), contentValues, null, null);
+
+        } else if (action.equals(ACTION_UPDATE)) {
+
+        } else if (action.equals(ACTION_DELETE)) {
+
         } else {
-            mLoader = getSupportLoaderManager().restartLoader(12, args, this);
+            showToast("Unknown error!");
         }
+
+
+
 
        /* ContentValues contentValues = new ContentValues();
         contentValues.put("id", 0);
@@ -133,7 +160,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
                 builder.append("\n");
             } while (data.moveToNext());
-            Toast.makeText(this, builder.toString(), Toast.LENGTH_LONG).show();
+            showToast(builder.toString());
+        } else {
+            showToast("Records with that ID do not exist.");
         }
 
     }
