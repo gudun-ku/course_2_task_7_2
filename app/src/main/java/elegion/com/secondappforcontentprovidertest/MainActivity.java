@@ -3,6 +3,7 @@ package elegion.com.secondappforcontentprovidertest;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -34,10 +35,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mToast.show();
     }
 
-    @Override
-    public void onClick(View v) {
-
-
+    private void doWork() {
         final String ACTION_QUERY = getString(R.string.str_action_query);
         final String ACTION_INSERT = getString(R.string.str_action_insert);
         final String ACTION_UPDATE = getString(R.string.str_action_update);
@@ -48,8 +46,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String table = tables[(int) mTableSpinner.getSelectedItemId()];
         String strId = mEditId.getText().toString();
         if (!strId.isEmpty()) {
-             try {
-                Long dataId = Long.parseLong(strId);
+            try {
+                Integer dataId = Integer.parseInt(strId);
             } catch (Exception e) {
                 showToast("Id is not a number!" );
                 return;
@@ -79,14 +77,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             ContentValues contentValues = new ContentValues();
             try {
                 if (table.equals("album")) {
-                    contentValues.put("id", Integer.parseInt(mEditData1.getText().toString()));
+                    contentValues.put("id", Integer.parseInt(strId));
                     contentValues.put("name", mEditData2.getText().toString());
                     contentValues.put("release", mEditData3.getText().toString());
                 } else if (table.equals("song")) {
-                    contentValues.put("id", Integer.parseInt(mEditData1.getText().toString()));
+                    contentValues.put("id", Integer.parseInt(strId));
                     contentValues.put("name", mEditData2.getText().toString());
                     contentValues.put("duration", mEditData3.getText().toString());
-                } else if (table.equals("album_song")) {
+                } else if (table.equals("albumsong")) {
                     contentValues.put("song_id", Integer.parseInt(mEditData2.getText().toString()));
                     contentValues.put("album_id", Integer.parseInt(mEditData3.getText().toString()));
                 }
@@ -94,19 +92,32 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 showToast("Wrong data! \n" + e.getMessage() );
                 return;
             }
-            getContentResolver().insert(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table), contentValues);
+
+            try {
+                getContentResolver().insert(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table), contentValues);
+            } catch (SQLiteConstraintException se) {
+                showToast("Error! That album or song id is wrong and does not exist in tables");
+                return;
+            } catch (Exception e) {
+                showToast("Error! " + e.getLocalizedMessage());
+                return;
+            }
+            showToast("Sucessfully inserted");
 
         } else if (action.equals(ACTION_UPDATE)) {
             ContentValues contentValues = new ContentValues();
             try {
 
                 if (table.equals("album")) {
+                    contentValues.put("id", Integer.parseInt(strId));
                     contentValues.put("name", mEditData2.getText().toString());
                     contentValues.put("release", mEditData3.getText().toString());
                 } else if (table.equals("song")) {
+                    contentValues.put("id", Integer.parseInt(strId));
                     contentValues.put("name", mEditData2.getText().toString());
                     contentValues.put("duration", mEditData3.getText().toString());
-                } else if (table.equals("album_song")) {
+                } else if (table.equals("albumsong")) {
+                    contentValues.put("id", Integer.parseInt(strId));
                     contentValues.put("song_id", Integer.parseInt(mEditData2.getText().toString()));
                     contentValues.put("album_id", Integer.parseInt(mEditData3.getText().toString()));
                 }
@@ -115,14 +126,38 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 return;
             }
 
-            int result = getContentResolver().update(ContentUris.withAppendedId(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table),Long.parseLong(strId)), contentValues, "id = ?", new String[]{strId});
+            int result = 0;
+            try {
+                result = getContentResolver().update(ContentUris.withAppendedId(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table), Long.parseLong(strId)), contentValues, null, null);
+            } catch (SQLiteConstraintException se) {
+                showToast("Error! That album or song id is wrong and does not exist in tables");
+                return;
+            } catch (Exception e) {
+                showToast("Error! " + e.getLocalizedMessage());
+                return;
+            }
             showToast("Updated " + result + " records.");
         } else if (action.equals(ACTION_DELETE)) {
-            int result = getContentResolver().delete(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table), "id = ?", new String[]{strId});
+
+            int result = 0;
+            try {
+                result = getContentResolver().delete(ContentUris.withAppendedId(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table),Long.parseLong(strId)), null, null);
+            } catch (SQLiteConstraintException se) {
+                showToast("Error! That album or song id is wrong and does not exist in tables");
+                return;
+            } catch (Exception e) {
+                showToast("Error! " + e.getLocalizedMessage());
+                return;
+            }
             showToast("Deleted " + result + " records.");
         } else {
             showToast("Unknown error!");
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        doWork();
     }
 
     void setupUi() {

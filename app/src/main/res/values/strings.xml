@@ -3,13 +3,13 @@
     <string name="table_label">Table</string>
     <string name="action_label">Action</string>
     <string name="id_label">Element Id</string>
-    <string name="btn_action_label">Show</string>
-    <string name="data1_label">data 1</string>
-    <string name="data2_label">data 2</string>
-    <string name="data3_label">data 3</string>
+    <string name="btn_action_label">Execute</string>
+    <string name="data1_label">field 1</string>
+    <string name="data2_label">field 2</string>
+    <string name="data3_label">field 3</string>
 
-    <string name="str_action_query">query</string>
-    <string name="str_action_insert">insert</string>
-    <string name="str_action_update">update</string>
-    <string name="str_action_delete">delete</string>
+    <string name="str_action_query"  translatable="false">query</string>
+    <string name="str_action_insert" translatable="false">insert</string>
+    <string name="str_action_update" translatable="false">update</string>
+    <string name="str_action_delete" translatable="false">delete</string>
 </resources>
