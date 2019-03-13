@@ -20,10 +20,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
  View.OnClickListener {
     private final int LOADER_ID = 12;
 
-    private final String ACTION_QUERY = getString(R.string.str_action_query);
-    private final String ACTION_INSERT = getString(R.string.str_action_insert);
-    private final String ACTION_UPDATE = getString(R.string.str_action_update);
-    private final String ACTION_DELETE = getString(R.string.str_action_delete);
 
     private Spinner mTableSpinner;
     private Spinner mActionSpinner;
@@ -42,19 +38,34 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onClick(View v) {
 
 
+        final String ACTION_QUERY = getString(R.string.str_action_query);
+        final String ACTION_INSERT = getString(R.string.str_action_insert);
+        final String ACTION_UPDATE = getString(R.string.str_action_update);
+        final String ACTION_DELETE = getString(R.string.str_action_delete);
+
         String[] tables =  getResources().getStringArray(R.array.tables);
         String action = mActionSpinner.getSelectedItem().toString();
         String table = tables[(int) mTableSpinner.getSelectedItemId()];
+        String strId = mEditId.getText().toString();
+        if (!strId.isEmpty()) {
+             try {
+                Long dataId = Long.parseLong(strId);
+            } catch (Exception e) {
+                showToast("Id is not a number!" );
+                return;
+            }
+        } else {
+            if (!action.equals(ACTION_QUERY) && !action.equals(ACTION_INSERT)) {
+                showToast("Empty id!");
+                return;
+            }
+        }
 
         if (action.equals(ACTION_QUERY)) {
-
             Bundle args = new Bundle();
             args.putString("ACTION", action);
             args.putString("TABLE", table);
-            args.putString("ID", mEditId.getText().toString());
-            args.putString("DATA1", mEditData1.getText().toString());
-            args.putString("DATA2", mEditData2.getText().toString());
-            args.putString("DATA3", mEditData3.getText().toString());
+            args.putString("ID", strId);
 
             mLoader = getSupportLoaderManager().getLoader(12);
             if (mLoader == null) {
@@ -66,27 +77,52 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         } else if (action.equals(ACTION_INSERT)) {
 
             ContentValues contentValues = new ContentValues();
-            contentValues.put("id", 0);
-            contentValues.put("name", "new Name");
-            contentValues.put("release", "tomorrow");
-            getContentResolver().update(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table + "/" + ), contentValues, null, null);
+            try {
+                if (table.equals("album")) {
+                    contentValues.put("id", Integer.parseInt(mEditData1.getText().toString()));
+                    contentValues.put("name", mEditData2.getText().toString());
+                    contentValues.put("release", mEditData3.getText().toString());
+                } else if (table.equals("song")) {
+                    contentValues.put("id", Integer.parseInt(mEditData1.getText().toString()));
+                    contentValues.put("name", mEditData2.getText().toString());
+                    contentValues.put("duration", mEditData3.getText().toString());
+                } else if (table.equals("album_song")) {
+                    contentValues.put("song_id", Integer.parseInt(mEditData2.getText().toString()));
+                    contentValues.put("album_id", Integer.parseInt(mEditData3.getText().toString()));
+                }
+            } catch (Exception e) {
+                showToast("Wrong data! \n" + e.getMessage() );
+                return;
+            }
+            getContentResolver().insert(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table), contentValues);
 
         } else if (action.equals(ACTION_UPDATE)) {
+            ContentValues contentValues = new ContentValues();
+            try {
 
+                if (table.equals("album")) {
+                    contentValues.put("name", mEditData2.getText().toString());
+                    contentValues.put("release", mEditData3.getText().toString());
+                } else if (table.equals("song")) {
+                    contentValues.put("name", mEditData2.getText().toString());
+                    contentValues.put("duration", mEditData3.getText().toString());
+                } else if (table.equals("album_song")) {
+                    contentValues.put("song_id", Integer.parseInt(mEditData2.getText().toString()));
+                    contentValues.put("album_id", Integer.parseInt(mEditData3.getText().toString()));
+                }
+            } catch (Exception e) {
+                showToast("Wrong data! \n" + e.getMessage() );
+                return;
+            }
+
+            int result = getContentResolver().update(ContentUris.withAppendedId(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table),Long.parseLong(strId)), contentValues, "id = ?", new String[]{strId});
+            showToast("Updated " + result + " records.");
         } else if (action.equals(ACTION_DELETE)) {
-
+            int result = getContentResolver().delete(Uri.parse("content://com.elegion.roomdatabase.musicprovider/" + table), "id = ?", new String[]{strId});
+            showToast("Deleted " + result + " records.");
         } else {
             showToast("Unknown error!");
         }
-
-
-
-
-       /* ContentValues contentValues = new ContentValues();
-        contentValues.put("id", 0);
-        contentValues.put("name", "new Name");
-        contentValues.put("release", "tomorrow");
-        getContentResolver().update(Uri.parse("content://com.elegion.roomdatabase.musicprovider/album/1"), contentValues, null, null);*/
     }
 
     void setupUi() {

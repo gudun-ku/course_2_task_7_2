@@ -17,6 +17,6 @@
         <item>@string/str_action_query</item>
         <item>@string/str_action_insert</item>
         <item>@string/str_action_update</item>
-        <item>@string/str_action_update</item>
+        <item>@string/str_action_delete</item>
     </string-array>
 </resources>
